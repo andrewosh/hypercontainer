@@ -1,0 +1,46 @@
+{
+  "name": "hypercontainer",
+  "version": "1.0.0",
+  "description": "Share and boot versioned containers from a hyperdrive",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && tape test/*.js"
+  },
+  "bin": {
+    "hypercontainer": "cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewosh/hypercontainer.git"
+  },
+  "keywords": [
+    "hyperdrive",
+    "container",
+    "docker"
+  ],
+  "author": "Andrew Osheroff <andrewosh@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andrewosh/hypercontainer/issues"
+  },
+  "homepage": "https://github.com/andrewosh/hypercontainer#readme",
+  "dependencies": {
+    "cuid": "^1.3.8",
+    "debug": "^2.2.0",
+    "dockerode": "^2.2.10",
+    "from2": "^2.1.1",
+    "hyperkv": "^1.7.0",
+    "level": "^1.4.0",
+    "lodash.find": "^4.4.0",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "pumpify": "^1.3.4",
+    "rc": "^1.1.6",
+    "subleveldown": "^2.1.0"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.3",
+    "standard": "^7.1.2",
+    "tape": "^4.5.1"
+  }
+}
