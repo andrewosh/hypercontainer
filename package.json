@@ -27,19 +27,29 @@
   "dependencies": {
     "cuid": "^1.3.8",
     "debug": "^2.2.0",
+    "discovery-swarm": "^3.4.0",
     "dockerode": "^2.2.10",
     "from2": "^2.1.1",
+    "fuse-bindings": "^2.8.1",
+    "hyperdrive": "^6.2.2",
     "hyperkv": "^1.7.0",
     "level": "^1.4.0",
+    "lexicographic-integer": "^1.1.0",
     "lodash.find": "^4.4.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "pump": "^1.0.1",
     "pumpify": "^1.3.4",
     "rc": "^1.1.6",
-    "subleveldown": "^2.1.0"
+    "shasum": "^1.0.2",
+    "stream": "0.0.2",
+    "stream-collector": "^1.0.1",
+    "subleveldown": "^2.1.0",
+    "through2": "^2.0.1"
   },
   "devDependencies": {
     "istanbul": "^0.4.3",
+    "memdb": "^1.3.1",
     "standard": "^7.1.2",
     "tape": "^4.5.1"
   }
