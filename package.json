@@ -35,7 +35,6 @@
     "hyperkv": "^1.7.0",
     "level": "^1.4.0",
     "lexicographic-integer": "^1.1.0",
-    "lodash.find": "^4.4.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "pump": "^1.0.1",
@@ -45,6 +44,7 @@
     "stream": "0.0.2",
     "stream-collector": "^1.0.1",
     "subleveldown": "^2.1.0",
+    "tar-stream": "^1.5.2",
     "through2": "^2.0.1"
   },
   "devDependencies": {
