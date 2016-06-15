@@ -78,7 +78,7 @@ test('should boot an image from the archive', function (t) {
     hypercontainer.create('docker', container.id, { seed: true }, function (err, imageId) {
       t.error(err)
       var hyper2 = Hypercontainer(memdb())
-      hyper2.run('docker', imageId, { cmd: 'ls' }, function (err) {
+      hyper2.run('docker', imageId, { cmd: 'cat linuxrc' }, function (err) {
         t.error(err)
       })
     })
