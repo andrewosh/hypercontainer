@@ -1,6 +1,8 @@
+// var path = require('path')
+
 var test = require('tape')
 var Docker = require('dockerode')
-
+// var level = require('level')
 var memdb = require('memdb')
 var through = require('through2')
 var hyperdrive = require('hyperdrive')
@@ -70,6 +72,7 @@ test('should create an image from a container in an archive, and seed it', funct
 })
 
 test('should boot an image from the archive', function (t) {
+  // var hypercontainer = Hypercontainer(level(path.join(__dirname, 'big_image')))
   var hypercontainer = Hypercontainer(memdb())
   var docker = new Docker()
   docker.run('alpine', ['ls'], noopStream(), function (err, data, container) {
@@ -78,7 +81,7 @@ test('should boot an image from the archive', function (t) {
     hypercontainer.create('docker', container.id, { seed: true }, function (err, imageId) {
       t.error(err)
       var hyper2 = Hypercontainer(memdb())
-      hyper2.run('docker', imageId, { cmd: 'cat linuxrc' }, function (err) {
+      hyper2.run('docker', imageId, { cmd: 'ash' }, function (err) {
         t.error(err)
       })
     })
