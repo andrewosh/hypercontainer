@@ -76,7 +76,6 @@ test('should boot an image from the archive', function (t) {
   var hypercontainer = Hypercontainer(memdb())
   var docker = new Docker()
   docker.run('alpine', ['ls'], noopStream(), function (err, data, container) {
-    console.log('here')
     t.error(err)
     hypercontainer.create('docker', container.id, { seed: true }, function (err, imageId) {
       t.error(err)
