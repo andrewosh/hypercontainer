@@ -33,7 +33,6 @@ test('should create an image from a container in an archive', function (t) {
   var hypercontainer = Hypercontainer(memdb())
   var docker = new Docker()
   docker.run('alpine', ['ls'], noopStream(), function (err, data, container) {
-    console.log('here')
     t.error(err)
     hypercontainer.create('docker', container.id, function (err, imageId) {
       debug('err:', err)
@@ -49,7 +48,6 @@ test('should create an image from a container in an archive, and seed it', funct
   var hypercontainer = Hypercontainer(memdb())
   var docker = new Docker()
   docker.run('alpine', ['ls'], noopStream(), function (err, data, container) {
-    console.log('here')
     t.error(err)
     hypercontainer.create('docker', container.id, { seed: true }, function (err, imageId) {
       t.error(err)
@@ -76,7 +74,6 @@ test('should boot an image from the archive', function (t) {
   var hypercontainer = Hypercontainer(memdb())
   var docker = new Docker()
   docker.run('alpine', ['ls'], noopStream(), function (err, data, container) {
-    console.log('here')
     t.error(err)
     hypercontainer.create('docker', container.id, { seed: true }, function (err, imageId) {
       t.error(err)
