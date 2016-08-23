@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package hypercontainer; 
+
+// Main data types
+message Image {
+  required string id = 1;
+}
+message Container {
+  required string id = 1;
+
+}
+message Images {
+  repeated Image images = 1;
+}
+message Containers {
+  repeated Container containers = 1;
+}
+
+// Error types
+enum Error {
+  BAD_IMAGE = 0;
+  BAD_CONTAINER = 1;
+  IMPORT_FAILED = 2;
+  RUN_FAILED = 3;
+  COMMIT_FAILED = 4;
+  ATTACH_FAILED = 5;
+}
+
+// Request types
+message ListRequest {}
+
+message ImageRequest {
+  required Image image = 1;
+}
+
+message ContainerRequest {
+  required Container container = 1;
+}
+
+message ContainerInput {
+  required Container container = 1;
+  optional bytes stdin = 2;
+}
+
+message ContainerOutput {
+  required Container container = 1;
+  optional bytes stdout = 2;
+  optional bytes stderr = 3;
+}
+
+// Response types
+message ImageResponse {
+  Error errorCode = 1;
+  string errorDescription = 2;
+  optional Image image = 3;  
+}
+
+message ContainerResponse {
+  Error errorCode = 1;
+  string errorDescription = 2;
+  optional Container container = 3;
+}
+
+message ImagesResponse {
+  Error errorCode = 1;
+  string errorDescription = 2;
+  repeated Image images = 3;
+}
+
+message ContainersResponse {
+  Error errorCode = 1;
+  string errorDescription = 2;
+  repeated Container containers = 3;
+}
+
+service HypercontainerDaemon {
+  rpc ListImages(ListRequest) returns (ImagesResponse) {};
+  rpc ListContainers(ListRequest) returns (ContainersResponse) {};
+  rpc ImportImage(ImageRequest) returns (ImageResponse) {};
+  rpc SeedImage(ImageRequest) returns (ImageResponse) {};
+  rpc RunImage(ImageRequest) returns (ContainerResponse) {};
+  rpc AttachToContainer(stream ContainerInput) returns (stream ContainerOutput) {};
+  rpc CommitContainer(ContainerRequest) returns (ImageResponse) {};
+}

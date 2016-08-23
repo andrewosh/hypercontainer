@@ -4,7 +4,8 @@
   "description": "Share and boot versioned containers from a hyperdrive",
   "main": "index.js",
   "scripts": {
-    "test": "standard && tape test/*.js"
+    "test": "standard && dependency-check && tape test/*.js",
+    "start": "node daemon/server.js"
   },
   "bin": {
     "hypercontainer": "cli.js"
@@ -25,13 +26,14 @@
   },
   "homepage": "https://github.com/andrewosh/hypercontainer#readme",
   "dependencies": {
+    "@andrewosh/hyperdrive": "^0.1.0",
     "cuid": "^1.3.8",
     "debug": "^2.2.0",
     "discovery-swarm": "^3.4.0",
     "dockerode": "^2.2.10",
     "from2": "^2.1.1",
     "fuse-bindings": "^2.8.1",
-    "hyperdrive": "^6.2.2",
+    "grpc": "^1.0.0",
     "hyperkv": "^1.7.0",
     "level": "^1.4.0",
     "lexicographic-integer": "^1.1.0",
@@ -49,6 +51,7 @@
     "through2": "^2.0.1"
   },
   "devDependencies": {
+    "dependency-check": "^2.6.0",
     "istanbul": "^0.4.3",
     "memdb": "^1.3.1",
     "standard": "^7.1.2",
