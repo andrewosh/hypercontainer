@@ -19,16 +19,20 @@ message Containers {
 
 // Error types
 enum Error {
-  BAD_IMAGE = 0;
-  BAD_CONTAINER = 1;
-  IMPORT_FAILED = 2;
-  RUN_FAILED = 3;
-  COMMIT_FAILED = 4;
-  ATTACH_FAILED = 5;
+  SUCCESS = 0;
+  BAD_IMAGE = 1;
+  BAD_CONTAINER = 2;
+  IMPORT_FAILED = 3;
+  SEED_FAILED = 4;
+  RUN_FAILED = 5;
+  COMMIT_FAILED = 6;
+  ATTACH_FAILED = 7;
+  LIST_FAILED = 8;
 }
 
 // Request types
 message ListRequest {}
+message StopRequest {}
 
 message ImageRequest {
   required Image image = 1;
@@ -51,27 +55,38 @@ message ContainerOutput {
 
 // Response types
 message ImageResponse {
-  Error errorCode = 1;
-  string errorDescription = 2;
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
   optional Image image = 3;  
 }
 
 message ContainerResponse {
-  Error errorCode = 1;
-  string errorDescription = 2;
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
   optional Container container = 3;
 }
 
 message ImagesResponse {
-  Error errorCode = 1;
-  string errorDescription = 2;
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
   repeated Image images = 3;
 }
 
+message RunRequest {
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
+  required Image image = 3;
+}
+
 message ContainersResponse {
-  Error errorCode = 1;
-  string errorDescription = 2;
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
   repeated Container containers = 3;
+}
+
+message StopResponse {
+  optional Error errorCode = 1 [default = 0];
+  optional string errorDescription = 2;
 }
 
 service HypercontainerDaemon {
@@ -79,7 +94,7 @@ service HypercontainerDaemon {
   rpc ListContainers(ListRequest) returns (ContainersResponse) {};
   rpc ImportImage(ImageRequest) returns (ImageResponse) {};
   rpc SeedImage(ImageRequest) returns (ImageResponse) {};
-  rpc RunImage(ImageRequest) returns (ContainerResponse) {};
-  rpc AttachToContainer(stream ContainerInput) returns (stream ContainerOutput) {};
+  rpc RunImage(RunRequest) returns (ContainerResponse) {};
   rpc CommitContainer(ContainerRequest) returns (ImageResponse) {};
+  rpc Stop(StopRequest) returns (StopResponse) {};
 }

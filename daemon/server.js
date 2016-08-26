@@ -9,16 +9,13 @@ var HyperContainer = require('../lib/container')
 
 var descriptor = grpc.load(path.join(__dirname, 'daemon.proto')).hypercontainer
 var manager = ImageManager()
+var daemonServer = null
 // container output is currently buffered fully in memory until streamed out
 var containers = {}
 
-function listImages (call, cb) {
-  return cb(new Error('not yet implemented'))
-}
-
-function getErrorMessage (errorCode)  {
+function getErrorMessage (errorCode) {
   switch (errorCode) {
-    case  descriptor.Error.BAD_IMAGE:
+    case descriptor.Error.BAD_IMAGE:
       return 'could not get image for that ID:'
     case descriptor.Error.BAD_CONTAINER:
       return 'could not get container with that ID:'
@@ -30,94 +27,81 @@ function getErrorMessage (errorCode)  {
       return 'could not boot image:'
     case descriptor.Error.COMMIT_FAILED:
       return 'could not commit container:'
-    case descriptor.Error.ATTACH_FAILED: 
+    case descriptor.Error.ATTACH_FAILED:
       return 'could not attach to container:'
+    case descriptor.Error.LIST_FAILED:
+      return 'could not list resource:'
+  }
 }
 
 function makeError (errorCode, err) {
   return { errorCode: errorCode, errorDescription: getErrorMessage(errorCode) + err }
 }
 
+function listImages (call, cb) {
+  manager.listImages(function (err, images) {
+    if (err) return cb(null, makeError(descriptor.Error.LIST_FAILED, err))
+    return cb(null, { images: images })
+  })
+  return cb(new Error('not yet implemented'))
+}
+
+function listContainers (call, cb) {
+  var containers = Object.keys(containers).map(function (c) {
+    return {id: c}
+  })
+  return cb(null, containers)
+}
+
 function seedImage (call, cb) {
-  var image = call.request.image
+  var image = call.request.image.id
   manager.get(image, function (err, image) {
-    if (err) return cb(null, makeError(description.Error.BAD_IMAGE, err))
+    if (err) return cb(null, makeError(descriptor.Error.BAD_IMAGE, err))
     image.seed(function (err, swarm) {
-      if (err) return cb(null, makeError(description.Error.SEED_FAILED, err))
-      return cb(null, { image: image.id })
+      if (err) return cb(null, makeError(descriptor.Error.SEED_FAILED, err))
+      return cb(null, { image: { id: image.id } })
     })
   })
 }
 
 function importImage (call, cb) {
-  var name = call.request.image
+  var name = call.request.image.id
   manager.import(name, function (err, image) {
-    if (err) return cb(null, makeError(description.Error.IMPORT_FAILED, err))
-    return cb(null, { image: image.id })
+    console.log('finishing with err:', err)
+    if (err) return cb(null, makeError(descriptor.Error.IMPORT_FAILED, err))
+    return cb(null, { image: { id: image.id } })
   })
 }
 
 function runImage (call, cb) {
   var image = call.request.image
-  manager.get(image, function (err, image) {
-    if (err) return cb(null, makeError(description.Error.BAD_IMAGE, err))
-    image.run(function (err, containerProc, container) {
-      if (err) return cb(null, makeError(description.Error.RUN_FAILED, err))
-      var stderr = stream()
-      var stdout = stream()
-      containerProc.stderr.pipe(stderr)
-      containerProc.stdout.pipe(stdout)
-      containers[container.id] = {
-        proc: containerProc,
-        container: container,
-        stderr: stderr,
-        stdout: stdout
-      }
-      return cb(null, { container: container.id })
+  var opts = call.request.opts
+  manager.get(image.id, function (err, image) {
+    if (err) return cb(null, makeError(descriptor.Error.BAD_IMAGE, err))
+    image.run(opts, function (err, container) {
+      if (err) return cb(null, makeError(descriptor.Error.RUN_FAILED, err))
+      containers[container.id] = container
+      return cb(null, { container: { id: container.id } })
     })
   })
 }
 
 function commitContainer (call, cb) {
-  var id = call.request.container
-  var containerInfo = containers[id]
-  if (!containerInfo) {
-    return cb(null, makeError(description.Error.BAD_CONTAINER))
+  var id = call.request.container.id
+  var container = containers[id]
+  if (!container) {
+    return cb(null, makeError(descriptor.Error.BAD_CONTAINER))
   }
-  var container = containerInfo.container
   container.commit(function (err, image) {
-    if (err) return cb(null, makeError(description.Error.COMMIT_FAILED, err))
+    if (err) return cb(null, makeError(descriptor.Error.COMMIT_FAILED, err))
     return cb(null, { image: image.id })
   })
 }
 
-function attachToContainer (call, cb) {
-  var id = null
-  var container = null
-  var outputListener = _writeMessage('stdout')
-  var errorListener = _writeMessage('stderr')
-  call.on('data', function (input) {
-    id = input.container
-    container = containers[id]
-    _attachOutput()
-    if (container && container.proc.connected) { 
-      container.proc.stdin.write(input.stdin)
-    }
-  })
-  call.on('end', function () {
-    container.stderr.removeListener('data', outputListener)
-    container.stdout.removeListener('data', errorListener)
-  })
-  function _attachOutput () {
-    container.stdout.on('data', outputListener)
-    container.stderr.on('data', errorListener)
-  }
-  function _writeMessage (name) {
-    return function (data) {
-      var msg = { container: id } 
-      msg[name] = data
-      call.write(msg)
-    }
+function stop (call, cb) {
+  console.log('Stopping hypercontainer daemon...')
+  if (daemonServer) {
+    daemonServer.stop()
   }
 }
 
@@ -125,20 +109,22 @@ function getServer () {
   var server = new grpc.Server()
   server.addProtoService(descriptor.HypercontainerDaemon.service, {
     listImages: listImages,
+    listContainers: listContainers,
     seedImage: seedImage,
     importImage: importImage,
     runImage: runImage,
     commitContainer: commitContainer,
-    attachToContainer: attachToContainer
+    stop: stop
   })
+  return server
 }
 
 if (require.main === module) {
-  var daemonServer = getServer()
+  daemonServer = getServer()
   var address = conf.host + ':' + conf.port
   console.log('Hypercontainer daemon starting at:', address)
   daemonServer.bind(address, grpc.ServerCredentials.createInsecure())
   daemonServer.start()
 }
-module.exports = getServer
 
+module.exports = getServer
