@@ -1,6 +1,6 @@
 {
   "name": "hypercontainer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Share and boot versioned containers from a hyperdrive",
   "main": "index.js",
   "scripts": {
