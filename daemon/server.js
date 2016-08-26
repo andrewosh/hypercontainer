@@ -66,6 +66,7 @@ function seedImage (call, cb) {
 
 function importImage (call, cb) {
   var name = call.request.image.id
+  console.log('importing...')
   manager.import(name, function (err, image) {
     console.log('finishing with err:', err)
     if (err) return cb(null, makeError(descriptor.Error.IMPORT_FAILED, err))
