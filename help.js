@@ -8,7 +8,7 @@ module.exports = function help () {
     import           import a Hyperimage from a local Docker image
     run              boot a container an image
     attach           attach to a running container
-    list-images       list all available images  that can be attached tothat can be booted
+    list-images      list all available images  that can be attached tothat can be booted
     list-containers  list all running containers
     seed             seed a image
     start-daemon     start the daemon process
