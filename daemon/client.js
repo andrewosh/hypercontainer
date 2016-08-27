@@ -1,6 +1,4 @@
 var path = require('path')
-var readline = require('readline')
-var stream = require('through2')
 var grpc = require('grpc')
 
 var conf = require('../conf')
@@ -47,7 +45,7 @@ function runImage (image, opts, cb) {
     cb = opts
     opts = {}
   }
-  client.runImage({ image: { id: image } }, function (err, response) {
+  client.runImage({ image: { id: image }, opts: JSON.stringify(opts) }, function (err, response) {
     if (err) return cb(err)
     if (checkError(response)) return handleError(response, cb)
     return cb(null, response.container.id)

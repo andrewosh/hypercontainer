@@ -76,6 +76,7 @@ message RunRequest {
   optional Error errorCode = 1 [default = 0];
   optional string errorDescription = 2;
   required Image image = 3;
+  optional string opts = 4;
 }
 
 message ContainersResponse {

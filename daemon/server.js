@@ -75,10 +75,11 @@ function importImage (call, cb) {
 }
 
 function runImage (call, cb) {
-  var image = call.request.image
-  var opts = call.request.opts
-  manager.get(image.id, function (err, image) {
+  var opts = JSON.parse(call.request.opts)
+  var image = (opts) ? opts.Image : call.request.image.id
+  manager.get(image, function (err, image) {
     if (err) return cb(null, makeError(descriptor.Error.BAD_IMAGE, err))
+    console.log('running image with opts:', JSON.stringify(opts))
     image.run(opts, function (err, container) {
       if (err) return cb(null, makeError(descriptor.Error.RUN_FAILED, err))
       containers[container.id] = container
